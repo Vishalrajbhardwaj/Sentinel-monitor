@@ -1,0 +1,20 @@
+# /etc/systemd/system/sentinel.service — the hub (dashboard + checks + alerts)
+# sudo cp deploy/sentinel.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now sentinel
+[Unit]
+Description=Sentinel server & security monitor (hub)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/sentinel
+ExecStart=/usr/bin/node server/index.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+# Needs to read /var/log/nginx/*.log and /var/log/auth.log: the adm group can on Ubuntu/Debian
+User=sentinel
+Group=adm
+
+[Install]
+WantedBy=multi-user.target

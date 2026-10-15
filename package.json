@@ -1,0 +1,21 @@
+{
+  "name": "sentinel-monitor",
+  "version": "1.0.0",
+  "description": "Server health, API route checks, attack & ransomware detection with email + phone alerts. Installable PWA.",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "demo": "node server/index.js --demo",
+    "agent": "node agent/agent.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.22.3",
+    "nodemailer": "^10.1.1",
+    "web-push": "^3.6.7"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "private": true
+}

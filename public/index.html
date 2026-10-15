@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Sentinel</title>
+  <meta name="description" content="Server health, API route checks, attack and ransomware detection with email and phone alerts.">
+  <meta name="theme-color" content="#0f1319">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/favicon-32.png" sizes="32x32">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Sentinel">
+  <link rel="preload" href="/fonts/archivo.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/styles.css">
+  <script>
+    // apply saved theme before paint
+    (function () { try { var t = localStorage.getItem('sentinel.theme'); if (t && t !== 'system') document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();
+  </script>
+</head>
+<body>
+  <noscript>Sentinel needs JavaScript to run.</noscript>
+  <script src="/charts.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

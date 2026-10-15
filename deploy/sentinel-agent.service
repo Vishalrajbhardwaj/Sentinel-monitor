@@ -1,0 +1,19 @@
+# /etc/systemd/system/sentinel-agent.service — run on each OTHER server you want watched
+# Put AGENT_* settings in /opt/sentinel/agent/.env, then:
+# sudo cp deploy/sentinel-agent.service /etc/systemd/system/ && sudo systemctl daemon-reload && sudo systemctl enable --now sentinel-agent
+[Unit]
+Description=Sentinel agent (sends metrics, attacks and ransomware events to the hub)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/sentinel
+ExecStart=/usr/bin/node agent/agent.js
+Restart=always
+RestartSec=5
+User=sentinel
+Group=adm
+
+[Install]
+WantedBy=multi-user.target
