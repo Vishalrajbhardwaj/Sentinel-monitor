@@ -101,25 +101,68 @@
   // ---------------------------------------------------------------- login
   function renderLogin(msg = '') {
     document.body.innerHTML = `
-      <main class="login"><form class="login-card" id="loginForm">
-        <div class="brand">${BRAND}<div><div class="brand-name">Sentinel</div><div class="brand-host">Server &amp; security monitor</div></div></div>
-        <div class="login-lamps" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-        <h1>Sign in</h1>
-        <p>Use the dashboard password from your server’s .env file.</p>
-        <div class="field"><label for="pw">Password</label><input class="input" id="pw" type="password" autocomplete="current-password" required autofocus></div>
-        <div class="err" id="loginErr">${esc(msg)}</div>
-        <button class="btn btn-primary" style="width:100%;height:42px;margin-top:6px">Sign in</button>
-      </form></main>`;
+      <main class="login">
+        <div class="login-layout">
+          <section class="login-intro" aria-label="Sentinel platform">
+            <div class="brand">${BRAND}<div><div class="brand-name">Sentinel</div><div class="brand-host">Server &amp; security monitor</div></div></div>
+            <div class="login-visual" aria-hidden="true">
+              <div class="login-orbit login-orbit-one"></div><div class="login-orbit login-orbit-two"></div>
+              <div class="login-shield"><svg viewBox="0 0 64 64" fill="none"><path d="M32 7 51 15v14c0 12-8.1 22.8-19 27C21.1 51.8 13 41 13 29V15l19-8Z" stroke="currentColor" stroke-width="2"/><path d="m23 32 6 6 13-14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span class="login-spark login-spark-one"></span><span class="login-spark login-spark-two"></span><span class="login-spark login-spark-three"></span>
+            </div>
+            <div class="login-intro-copy">
+              <div class="login-eyebrow"><span class="live-dot on"></span> SERVER OPERATIONS, IN FOCUS</div>
+              <h1>Stay ahead of<br>what matters.</h1>
+              <p>One secure place to keep an eye on your servers, API health and security events.</p>
+            </div>
+            <ul class="login-features">
+              <li><span>${I.check}</span>Live server health monitoring</li>
+              <li><span>${I.check}</span>API availability checks</li>
+              <li><span>${I.check}</span>Security event visibility</li>
+            </ul>
+            <div class="login-intro-foot"><span class="live-dot on"></span> Your infrastructure. One clear view.</div>
+          </section>
+          <section class="login-side">
+            <form class="login-card" id="loginForm">
+              <div class="login-mobile-brand brand">${BRAND}<div><div class="brand-name">Sentinel</div><div class="brand-host">Server &amp; security monitor</div></div></div>
+              <div class="login-card-mark" aria-hidden="true">${I.security}</div>
+              <div class="login-eyebrow">ADMINISTRATOR ACCESS</div>
+              <h2>Welcome back</h2>
+              <p>Sign in to open your monitoring dashboard.</p>
+              <div class="field login-password-field">
+                <label for="pw">Dashboard password</label>
+                <div class="login-password">
+                  <input class="input" id="pw" type="password" autocomplete="current-password" aria-describedby="loginErr" required autofocus>
+                  <button class="password-toggle" id="togglePassword" type="button" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.4-6 9.5-6 9.5 6 9.5 6-3.4 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button>
+                </div>
+              </div>
+              <div class="err" id="loginErr" role="alert" aria-live="polite">${esc(msg)}</div>
+              <button class="btn btn-primary login-submit" type="submit">Sign in to Sentinel <span aria-hidden="true">→</span></button>
+              <div class="login-secure-note"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10" width="15" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>Dashboard access is protected by your server password</div>
+            </form>
+          </section>
+        </div>
+        <div class="login-page-foot">© ${new Date().getFullYear()} Sentinel <span>·</span> Built for confident operations</div>
+      </main>`;
+    $('#togglePassword').addEventListener('click', (e) => {
+      const button = e.currentTarget;
+      const input = $('#pw');
+      const show = input.type === 'password';
+      input.type = show ? 'text' : 'password';
+      button.setAttribute('aria-pressed', String(show));
+      button.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+      input.focus();
+    });
     $('#loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = e.target.querySelector('button'); btn.disabled = true;
+      const btn = e.target.querySelector('[type="submit"]'); btn.disabled = true; btn.textContent = 'Signing in…';
       try {
         const r = await fetch('/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ password: $('#pw').value }) });
         const d = await r.json();
         if (!r.ok) throw new Error(d.error || 'Sign in failed');
         S.token = d.token; localStorage.setItem('sentinel.token', d.token);
         boot();
-      } catch (err) { $('#loginErr').textContent = err.message; btn.disabled = false; }
+      } catch (err) { $('#loginErr').textContent = err.message; btn.disabled = false; btn.innerHTML = 'Sign in to Sentinel <span aria-hidden="true">→</span>'; }
     });
   }
   function logout() {
@@ -499,7 +542,7 @@
     const hdrs = d.headers && Object.keys(d.headers).length ? JSON.stringify(d.headers, null, 2) : '';
     sheet.innerHTML = `
       <form method="dialog" id="rf">
-        <div class="sheet-head"><h2>${r ? 'Edit route' : 'Add route'}</h2><button class="btn btn-ghost icon-btn" value="cancel" aria-label="Close">${I.close}</button></div>
+        <div class="sheet-head"><h2>${r ? 'Edit route' : 'Add route'}</h2><button type="button" class="btn btn-ghost icon-btn" id="closeSheet" aria-label="Close">${I.close}</button></div>
         <div class="sheet-body">
           <div class="form-grid">
             <div class="field full"><label for="f-name">Name</label><input class="input" id="f-name" name="name" value="${esc(d.name || '')}" placeholder="Orders API" required></div>
@@ -530,6 +573,7 @@
         </div>
       </form>`;
     const form = $('#rf');
+    $('#closeSheet').onclick = () => sheet.close();
     const syncType = () => { const tcp = $('#f-type').value === 'tcp'; $$('.http', form).forEach((x) => x.classList.toggle('hidden', tcp)); $$('.tcp', form).forEach((x) => x.classList.toggle('hidden', !tcp)); };
     $('#f-type').onchange = syncType; syncType();
     const collect = () => { const o = Object.fromEntries(new FormData(form).entries()); o.paused = !!o.paused; return o; };

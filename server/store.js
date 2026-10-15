@@ -65,12 +65,51 @@ function load() {
     const saved = JSON.parse(fs.readFileSync(FILE, 'utf8'));
     for (const k of Object.keys(state)) if (saved[k] !== undefined) state[k] = saved[k];
     state.settings = { ...DEFAULT_SETTINGS, ...(saved.settings || {}) };
+    if (!config.DEMO) removeStaleDemoData();
     // raw samples are not persisted; reset live fields
     for (const s of Object.values(state.servers)) { s.series = []; s.online = s.id === config.SERVER_ID; }
     state.meta.startedAt = Date.now();
   } catch (e) {
     console.error('[store] could not load state:', e.message);
   }
+}
+
+function removeStaleDemoData() {
+  const demoRouteIds = new Set(state.routes
+    .filter((r) => r.url?.includes('/demo-api/') ||
+      (r.type === 'tcp' && r.host === '127.0.0.1' && r.port === 6399) ||
+      (r.name === 'Hub port' && r.host === '127.0.0.1'))
+    .map((r) => r.id));
+  const demoServerIds = Object.values(state.servers)
+    .filter((s) => (s.id === 'payments-api' && s.name === 'payments-api-01') || (s.id === 'db-replica' && s.name === 'db-replica-02'))
+    .map((s) => s.id);
+  if (!demoRouteIds.size && !demoServerIds.length) return;
+
+  state.routes = state.routes.filter((r) => !demoRouteIds.has(r.id));
+  for (const id of demoRouteIds) {
+    delete state.routeState[id];
+    delete state.checks[id];
+  }
+  for (const id of demoServerIds) delete state.servers[id];
+  const local = state.servers[config.SERVER_ID];
+  if (local) {
+    local.latest = null;
+    local.series = [];
+    local.minutes = [];
+    local.hours = [];
+    local.firstSeen = Date.now();
+    local.lastSeen = 0;
+    local.online = true;
+  }
+
+  // Old demo records have no provenance, so reset mixed-in traffic and event history.
+  state.traffic = {};
+  state.threats = [];
+  state.alerts = [];
+  state.reports = [];
+  state.ipStats = {};
+  state.hour = null;
+  console.warn('[store] Removed stale demo data; real monitoring history will build from live sources.');
 }
 
 let saving = false;

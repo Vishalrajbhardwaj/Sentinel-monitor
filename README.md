@@ -32,9 +32,11 @@ npm install
 npm run demo          # fake API, simulated attacks, 2 simulated servers, 24h of history
 ```
 
-Works the same in Windows PowerShell/CMD, macOS and Linux. Open http://localhost:8080 — password `admin123`. Go to **Settings → Try it** and press *Ransomware*, *SQL injection*, *Orders API outage*… to watch detection and alerts happen live.
+Works the same in Windows PowerShell/CMD, macOS and Linux. Open http://localhost:8080 — password `admin123`. Go to **Settings → Try it** and press *Ransomware*, *SQL injection*, *Orders API outage*… to watch detection and alerts happen live. This demo uses simulated APIs, servers, traffic and attacks.
 
 Any setting can be given as a flag on any OS, e.g. `node server/index.js --demo --port=9000`, or put in the `.env` file. (In PowerShell, environment variables are set as `$env:PORT="9000"` — the `PORT=9000 node …` form only works in Mac/Linux shells.)
+
+For live monitoring, start with `npm start` (or `node server/index.js`) and keep `DEMO=false` in `.env`. The local server's CPU, memory and disk are sampled continuously; add your own API routes, actual access/auth log paths and remote-server agents to monitor those real sources. Log paths and protected folders are OS-specific. Use `npm run demo` only when you explicitly want simulated data.
 
 ## 2. Run it for real
 
